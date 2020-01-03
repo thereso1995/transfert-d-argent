@@ -41,8 +41,8 @@ class AppFixtures extends Fixture
         $manager->persist($profilUtil);
         
         $SupUser=new User();
-        $password=$this->encoder->encodePassword($SupUser, 'password');
-        $SupUser->setUsername('Jean')
+        $password=$this->encoder->encodePassword($SupUser, 'pass');
+        $SupUser->setUsername('lopy')
              ->setRoles(['ROLE_SuperAdmin'])
              ->setPassword($password)
              ->setNom('Therese')
