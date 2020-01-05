@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -57,6 +59,11 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $statut;
+
+    private $profil;
+
+   
+    
 
     public function getId(): ?int
     {
@@ -187,6 +194,29 @@ class User implements UserInterface
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+   
+
+
+    /**
+     * Get the value of profil
+     */ 
+    public function getProfil()
+    {
+        return $this->profil;
+    }
+
+    /**
+     * Set the value of profil
+     *
+     * @return  self
+     */ 
+    public function setProfil($profil)
+    {
+        $this->profil = $profil;
 
         return $this;
     }

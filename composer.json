@@ -9,6 +9,7 @@
         "doctrine/doctrine-migrations-bundle": "^2.1",
         "dompdf/dompdf": "^0.8.3",
         "friendsofsymfony/rest-bundle": "^2.6",
+        "laminas/laminas-code": "^3.4",
         "lexik/jwt-authentication-bundle": "^2.6",
         "nelmio/cors-bundle": "^2.0",
         "sensio/framework-extra-bundle": "^5.5",
