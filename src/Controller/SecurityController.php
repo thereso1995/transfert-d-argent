@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepository;
 use App\Repository\ProfilRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -125,6 +126,19 @@ class SecurityController extends AbstractFOSRestController
         return $this->json([
             'username' => $user->getUsername(),
             'roles' => $user->getRoles()
+        ]);
+    }
+
+    /**
+     * @Route("/list/user", name="list_user", methods={"GET"})
+     */
+    public function lister(UserRepository $UserRepository, SerializerInterface $serializer)
+    {
+        $user = $UserRepository->findAll();
+        $data = $serializer->serialize($user, 'json');
+
+        return new Response($data, 200, [
+            'content-Type' => 'application/json'
         ]);
     }
 }
