@@ -39,10 +39,4 @@ class Profil
 
         return $this;
     }
-
-    
-
-  
-
-  
 }

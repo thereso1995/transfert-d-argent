@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controller;
-
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -16,14 +14,11 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
 /**
  * @Route("/api")
  */
-
 class SecurityController extends AbstractFOSRestController
 {
-
     private $actif;
     private $message;
     private $statut;
@@ -34,23 +29,17 @@ class SecurityController extends AbstractFOSRestController
         $this->actif="Actif";
         $this->message="message";
         $this->statut="statut";
-
     }
-
-
      /**
      * @Route("/inscription", name="inscription", methods={"POST"})
      */
-
      public function inscriptionUser(Request $request,EntityManagerInterface $entityManager,UserPasswordEncoderInterface $encoder, UserInterface $Userconnecte, ProfilRepository $repoProfil,  ValidatorInterface $validator){
-
          #####################----------Début traitement formulaire et envoie des données----------#####################
             
          $user=new User();
          $form = $this->createForm(UserType::class,$user);
         $data = $request->request->all();
         $form->submit($data);
-
           #####################-----------Fin traitement formulaire et envoie des données-----------#####################
         
         #####################----------------Début controle de saissie des profils----------------#####################
@@ -59,36 +48,26 @@ class SecurityController extends AbstractFOSRestController
         if(!$profil=$repoProfil->find($idProfil)){
             throw new HttpException(404,'Ce profil n\'existe pas !');
         }
-
         #####################-----------------Fin controle de saissie des profils-----------------#####################
-
         #####################----------------Début gestion des roles pouvant ajouter -------------#####################
-
         $roleUserConnecte[]=$Userconnecte->getRoles()[0];# on le met dans un tableau pour le comparer aux roles (qui sont des tableaux), le [1] est le role user par defaut
         $libelle=$profil->getLibelle();
         $roles=['ROLE_'.$libelle];
         $this->validationRole($roles,$roleUserConnecte);
         $user->setRoles($roles);
      
-
        #####################-------------------------Fin gestion des roles ---------------------#####################
-
         #####################------------------Début finalisation de l'inscription----------------#####################
                
         $user->setStatut($this->actif);
         
         $hash=$encoder->encodePassword($user, $user->getPassword());
         $user->setPassword($hash);
-
-
         $entityManager = $this->getDoctrine()->getManager();
-
         $entityManager->persist($user);
         $entityManager->flush();
         return $this->handleView($this->view([$this->statut=>'Enregistrer'],Response::HTTP_CREATED));
-
     }
-
     /**
      * @Route("/userConnecte", name="userConnecte", methods={"GET"})
      */
@@ -96,7 +75,6 @@ class SecurityController extends AbstractFOSRestController
         $data = $serializer->serialize($userConnecte,'json',[ 'groups' => ['list-user']]);
         return new Response($data,200);
     }
-
     public function validationRole($roles,$roleUserConnecte){
         $roleSupAdmi=['ROLE_SuperAdmin'];
         $roleCaissier=['ROLE_Caissier'];
@@ -110,13 +88,10 @@ class SecurityController extends AbstractFOSRestController
                $roles == $roleCaissier && $roleUserConnecte != $roleSupAdmi   ||
                $roles == $roleAdmi     && $roleUserConnecte != $roleAdmiPrinc ||
                $roles == $user  && $roleUserConnecte != $roleAdmiPrinc && $roleUserConnecte != $roleAdmi
-
         ){//Vérifier que son profil lui permet de l'ajouter
              throw new HttpException(403,'Votre profil ne vous permet pas de créer ce type d\'utilisateur');
         }
     }
-
-
     /**
      * @Route("/login_check", name="login", methods={"POST"})
      */
@@ -128,7 +103,6 @@ class SecurityController extends AbstractFOSRestController
             'roles' => $user->getRoles()
         ]);
     }
-
     /**
      * @Route("/list/user", name="list_user", methods={"GET"})
      */
@@ -136,7 +110,6 @@ class SecurityController extends AbstractFOSRestController
     {
         $user = $UserRepository->findAll();
         $data = $serializer->serialize($user, 'json');
-
         return new Response($data, 200, [
             'content-Type' => 'application/json'
         ]);

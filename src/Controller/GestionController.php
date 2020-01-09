@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controller;
-
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,15 +10,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-
 /**
  * @Route("/api")
  */
-
 class GestionController extends AbstractFOSRestController
 {
-
     private $actif;
     private $message;
     private $status;
@@ -32,8 +26,6 @@ class GestionController extends AbstractFOSRestController
         $this->status="status";
         $this->bloqueStr='Bloqué';
     }
-
-
      /**
      * @Route("/list/utilisateur", name="list_utilisateur", methods={"GET"})
      */
@@ -41,12 +33,10 @@ class GestionController extends AbstractFOSRestController
     {
         $user = $UserRepository->findAll();
         $data = $serializer->serialize($user, 'json');
-
         return new Response($data, 200, [
             'Content-Type' => 'application/json'
         ]);
     }
-
     /**
     * @Route("/bloque/user/{id}", name="bloque_user", methods={"GET"})
     */ 
@@ -79,5 +69,4 @@ class GestionController extends AbstractFOSRestController
         $afficher = [ $this->status => 200, $this->message => $texte];
         return $this->handleView($this->view($afficher,Response::HTTP_OK));
     }
-
 }
