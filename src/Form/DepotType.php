@@ -12,7 +12,7 @@ class DepotType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date')
+            
             ->add('montant')
             ->add('user')
             ->add('compte')

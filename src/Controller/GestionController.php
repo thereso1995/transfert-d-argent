@@ -2,12 +2,15 @@
 namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Compte;
+use App\Entity\Depot;
 use App\Form\UserType;
 use App\Form\CompteType;
+use App\Form\DepotType;
 use App\Entity\Entreprise;
 use App\Form\EntrepriseType;
 use App\Repository\UserRepository;
 use App\Repository\CompteRepository;
+use App\Repository\DepotRepository;
 use App\Repository\EntrepriseRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use FOS\RestBundle\Controller\AbstractFOSsRetController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 /**
  * @Route("/api")
@@ -41,7 +44,7 @@ class GestionController extends AbstractFOSRestController
         $this->bloqueStr='Bloqué';
         $this->compteStr='compte';
         $this->saTransfert="SA Transfert";
-        $this->numeroCompte= "numeroCompte";
+        $this->numero_compte= "numero_compte";
     }
 
 
@@ -93,6 +96,42 @@ public function ajouPartenaire (Request $request, EntityManagerInterface $entity
     ];
     return $this->handleView($this->view($afficher,Response::HTTP_OK));       
 }
+
+/**
+    * @Route("/nouveau/depot", methods={"POST"})
+    */
+
+    public function depot (Request $request, ValidatorInterface $validator, UserInterface $Userconnecte,CompteRepository $repo, EntityManagerInterface $entityManager){
+
+        $depot = new Depot();
+        $form = $this->createForm(DepotType::class, $depot);
+        $data = $request->request->all();
+        if($compte=$repo->findOneBy([ $this->numero_compte=>$data[$this->compteStr]])){
+            $data[$this->compteStr]=$compte->getId();//on lui donne directement l'id
+            if($compte->getEntreprise()->getRaisonSociale()==$this->saTransfert){
+                throw new HttpException(403,'On ne peut pas faire de depot dans le compte de SA Transfert!');
+            }
+        }
+        else{
+            throw new HttpException(404,'Ce numero de compte n\'existe pas!');
+        }
+        $form->submit($data);
+
+        $depot->setDate(new \Datetime());
+        $depot->setUser($Userconnecte);
+        $compte=$depot->getCompte();
+        $compte->setSolde($compte->getSolde()+$depot->getMontant());
+        $entityManager->persist($compte);
+        $entityManager->persist($depot);
+        $entityManager->flush();
+        $afficher = [
+             $this->statut => 201,
+             $this->message => 'Le depot a bien été effectué dans le compte '.$compte->getNumeroCompte()
+        ];
+
+        return $this->handleView($this->view($afficher,Response::HTTP_CREATED));
+
+    }
 
      /**
      * @Route("/list/utilisateur", name="list_utilisateur", methods={"GET"})

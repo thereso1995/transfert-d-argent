@@ -115,4 +115,12 @@ class Compte
     }
 
    
+
+    /**
+     * Get the value of id
+     */ 
+    public function getId()
+    {
+        return $this->id;
+    }
 }
